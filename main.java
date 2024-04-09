@@ -1,68 +1,102 @@
 import java.util.Scanner;
 
-public class main {
+public class Main {
     public static void main(String[] args) {
+        char[] letrasMayusculas = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
+                'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+        char[] letrasMinusculas = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+                'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+        char[] numeros = { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' };
+        char[] caracteresEspeciales = { '*', '+', '-', '/', '#', '$', '%', '&', '_', '!' };
+
         Scanner sc = new Scanner(System.in);
 
-        String palabras = "golondrina avetoro codorniz garcilla alcotan abubilla perdiz abejaruco vencejo gavilan papamoscas petirrojo colirrojo pechiazul lavandera mosquitero milano aguila roquero estornino treparriscos halcon buitre canastera picapinos gorrion verderon verdecillo buitron bigotudo ";
-        int numPalabras = 29;
-        int numeroAleatorio = (int) (Math.random() * numPalabras);
-        int b = 0;
-        String palabra = "";
-        boolean compr = true;
+        int opcion;
+        do {
+            Menu();
+            opcion = Opcion(sc);
 
-        // Sacar palabra aleatoria
-        for (int i = 0; i < palabras.length(); i++) {
-            if (palabras.charAt(i) == ' ') {
-                b++;
+            switch (opcion) {
+                case 1:
+                    ContraseñaDebil(letrasMinusculas, numeros);
+                    break;
+                case 2:
+                    ContraseñaFuerte(letrasMayusculas, letrasMinusculas, numeros, caracteresEspeciales);
+                    break;
+                case 3:
+                    System.out.println("Programa terminado.");
+                    break;
+                default:
+                    System.out.println("Opción incorrecta. Inténtalo de nuevo.");
             }
-            if (compr == true) {
-                if (b == numeroAleatorio) {
-                    int a = palabras.indexOf(' ', i + 1);
-                    palabra = palabras.substring(i, a);
-                    compr = false;
+        } while (opcion != 3);
+    }
+
+    // Función Menu
+    public static void Menu() {
+        System.out.println("\nMenú:");
+        System.out.println("1. Generar e imprimir una contraseña débil.");
+        System.out.println("2. Generar e imprimir una contraseña fuerte.");
+        System.out.println("3. Salir del programa.");
+    }
+
+    // Funcion Opcion
+    public static int Opcion(Scanner sc) {
+        System.out.print("Seleccione una opción: ");
+        return sc.nextInt();
+    }
+
+    // Funcion contraseña debil
+    public static void ContraseñaDebil(char[] letrasMinusculas, char[] numeros) {
+        char[] contrasena = new char[8];
+        for (int i = 0; i < 8; i++) {
+            if (Math.random() < 0.5) {
+                int index = (int) (Math.random() * letrasMinusculas.length);
+                contrasena[i] = letrasMinusculas[index];
+            } else {
+                int index = (int) (Math.random() * numeros.length);
+                contrasena[i] = numeros[index];
+            }
+        }
+        System.out.println("Contraseña débil generada: " + new String(contrasena));
+    }
+
+    // Funcion contraseña fuerte
+    public static void ContraseñaFuerte(char[] letrasMayusculas, char[] letrasMinusculas,
+            char[] numeros, char[] caracteresEspeciales) {
+        char[] contrasena = new char[13];
+        char caracterEspecial = caracteresEspeciales[(int) (Math.random() * caracteresEspeciales.length)];
+        char letraMayuscula = letrasMayusculas[(int) (Math.random() * letrasMayusculas.length)];
+
+        contrasena[0] = caracterEspecial;
+        contrasena[1] = letraMayuscula;
+
+        int index = 2;
+        while (index < 13) {
+            char character;
+            int type = (int) (Math.random() * 3);
+            if (type == 0) {
+                character = letrasMinusculas[(int) (Math.random() * letrasMinusculas.length)];
+            } else if (type == 1) {
+                character = numeros[(int) (Math.random() * numeros.length)];
+            } else {
+                character = caracteresEspeciales[(int) (Math.random() * caracteresEspeciales.length)];
+            }
+
+            boolean exists = false;
+            for (int i = 0; i < index; i++) {
+                if (contrasena[i] == character) {
+                    exists = true;
+                    break;
                 }
             }
-        }
 
-        // Inicializar palabra oculta con guiones bajos
-        String palabraOculta = palabra.replaceAll("[a-zA-Z]", "_");
-
-        int intentos = 0;
-        int fallos = 5;
-
-        while (fallos >= 0 && palabraOculta.contains("_")) {
-            System.out.println();
-            System.out.println("Intenta adivinar la palabra misteriosa");
-            System.out.println(palabraOculta);
-            System.out.println("\nIntentos hechos: " + intentos + "; Fallos restantes: " + fallos);
-            System.out.print("Introduce una letra: ");
-            char letra = sc.next().charAt(0);
-            boolean letraAdivinada = false;
-
-            String nuevaPalabraOculta = "";
-            for (int i = 0; i < palabra.length(); i++) {
-                if (palabra.charAt(i) == letra && palabraOculta.charAt(i) == '_') {
-                    nuevaPalabraOculta += letra;
-                    letraAdivinada = true;
-                } else {
-                    nuevaPalabraOculta += palabraOculta.charAt(i);
-                }
+            if (!exists) {
+                contrasena[index] = character;
+                index++;
             }
-
-            if (!letraAdivinada) {
-                fallos--;
-            }
-
-            intentos++;
-            palabraOculta = nuevaPalabraOculta;
         }
 
-        if (fallos < 0) {
-            System.out.println("\nLa palabra secreta era: " + palabra);
-            System.out.println("Lo siento, has fallado tras " + intentos + " intentos");
-        } else {
-            System.out.println("\n¡Felicidades! Has adivinado la palabra: " + palabra);
-        }
+        System.out.println("Contraseña fuerte generada: " + new String(contrasena));
     }
 }
